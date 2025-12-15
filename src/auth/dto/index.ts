@@ -1,7 +1,5 @@
 import { IsEmail, IsString, Matches, MaxLength } from 'class-validator';
-
-const PASSWORD_REGEXP = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
-const TAG_REGEXP = /([a-z0-9_])$/;
+import { PASSWORD_REGEXP, TAG_REGEXP } from '../../constant';
 
 export class LoginDTO {
   @IsString()
