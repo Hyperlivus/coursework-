@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export interface UserCreationAttributes {
   email: string;
@@ -8,7 +8,6 @@ export interface UserCreationAttributes {
 }
 
 @Entity()
-@Unique(['email', 'tag'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
