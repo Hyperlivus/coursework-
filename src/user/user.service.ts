@@ -4,6 +4,10 @@ import { User, UserCreationAttributes } from './entry/user.entry';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditUserDto } from './dto';
 import { hash } from 'bcrypt';
+import { authError } from '../auth/errors';
+import { userErrors } from './errors';
+
+const NOT_UNIQUE_TAG_CODE = 'UQ_7360583b3b97a10fb0d971bafde';
 
 @Injectable()
 export class UserService {
@@ -36,6 +40,23 @@ export class UserService {
     if (dto.password) {
       updated.password = await hash(dto.password, 10);
     }
-    return await this.userRepository.update(user, updated);
+
+    const newUser = {
+      ...user,
+      ...updated,
+    };
+
+    console.log(newUser);
+
+    const updateRes = await this.userRepository.save(newUser).catch((err) => {
+      console.log(err);
+      if (err.constraint === NOT_UNIQUE_TAG_CODE)
+        return authError.TAG_ALREADY_EXISTS;
+      return userErrors.UNKNOWN_EDIT_ERROR;
+    });
+
+    if (updateRes instanceof Error) throw updateRes;
+
+    return updateRes;
   }
 }

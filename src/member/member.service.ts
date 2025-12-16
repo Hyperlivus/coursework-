@@ -4,7 +4,7 @@ import { User } from '../user/entry/user.entry';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member, Role } from './entity/member.entity';
 import { Repository } from 'typeorm';
-import { DONT_HAVE_ACCESS_TO_CHAT, SUPER_ADMIN_ONLY_ONE } from './errors';
+import { memberError } from './errors';
 
 const ROLE_ACCESSES: Record<Role, number> = {
   [Role.MEMBER]: 1,
@@ -15,8 +15,7 @@ const ROLE_ACCESSES: Record<Role, number> = {
 @Injectable()
 export class MemberService {
   constructor(
-    @InjectRepository(Member)
-    private memberRepository: Repository<Member>,
+    @InjectRepository(Member) private memberRepository: Repository<Member>,
   ) {}
 
   async superAdminAlreadyExists(chatId: number) {
@@ -33,22 +32,25 @@ export class MemberService {
   async findMember(
     userId: number,
     chatId: number,
-    options = {
-      throwError: true,
-    },
-    repository = this.memberRepository,
+    repository: Repository<Member> = this.memberRepository,
   ) {
-    const member = await repository.findOne({
+    return await repository.findOne({
       where: {
         user: {
           id: userId,
         },
-        chat: {
-          id: chatId,
-        },
+        chat: { id: chatId },
       },
     });
-    if (options.throwError && member === null) throw DONT_HAVE_ACCESS_TO_CHAT;
+  }
+
+  async findMemberSafe(
+    userId: number,
+    chatId: number,
+    repository = this.memberRepository,
+  ) {
+    const member = await this.findMember(userId, chatId, repository);
+    if (!member) throw memberError.NOT_A_MEMBER;
     return member;
   }
 
@@ -63,25 +65,54 @@ export class MemberService {
   }
 
   async create(
-    user: User,
     dto: MemberCreationDto,
+    adminUser?: User,
     repository = this.memberRepository,
   ) {
+    if (adminUser !== undefined) {
+      const adminMember = await this.findMemberSafe(adminUser.id, dto.chatId);
+      const role = dto.role ?? Role.MEMBER;
+      const requiredRole = role === Role.MEMBER ? Role.ADMIN : Role.SUPER_ADMIN;
+      const access = this.haveAccess(adminMember, requiredRole);
+      if (!access) {
+        throw memberError.NO_ACCESS;
+      }
+    }
+
     if (
       dto.role === Role.SUPER_ADMIN &&
       (await this.superAdminAlreadyExists(dto.chatId))
     )
-      throw SUPER_ADMIN_ONLY_ONE;
+      throw memberError.SUPER_ADMIN_ALREADY_EXISTS;
 
     const member = repository.create({
       role: dto.role ?? Role.MEMBER,
       chat: {
         id: dto.chatId,
       },
-      user,
+      user: {
+        id: dto.userId,
+      },
     });
 
-    return this.memberRepository.save(member);
+    return repository.save(member);
+  }
+
+  async deleteMember(user: User, memberId: number) {
+    const member = await this.memberRepository.findOne({
+      where: {
+        id: memberId,
+      },
+    });
+    if (!member) throw memberError.NOT_FOUND;
+    const myMember = await this.findMemberSafe(user.id, memberId);
+
+    let access: boolean =
+      member.role === Role.MEMBER
+        ? this.haveAccess(myMember, Role.ADMIN)
+        : this.haveAccess(myMember, Role.SUPER_ADMIN);
+
+    if (!access) throw memberError.NO_ACCESS;
   }
 
   haveAccess(member: Member, role: Role) {

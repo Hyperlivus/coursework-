@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { ChatCreationDto } from './dto';
 import { type AuthorizedRequest, AuthRequired } from '../auth/guard/auth.guard';
 import { ChatService } from './chat.service';
@@ -17,4 +26,7 @@ export class ChatController {
   async search(@Query('query') query: string) {
     return this.chatService.search(query);
   }
+
+  @Get('/statistic')
+  async statistic(@Param('id') chatId: number) {}
 }

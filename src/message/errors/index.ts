@@ -1,6 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-
-export const NOT_FOUND = new NotFoundException('message not found');
-export const CANNOT_EDIT_MESSAGE = new BadRequestException(
-  'this user cannot edit message',
-);
+export const messagesErrors = {
+  NOT_FOUND: 'message not found',
+  NO_ACCESS: 'you cannot delete or edit this message',
+};

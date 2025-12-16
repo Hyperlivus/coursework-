@@ -27,6 +27,6 @@ export class User {
   @Column({ type: 'varchar', length: 128, nullable: true })
   avatarUrl?: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   bio?: string;
 }

@@ -12,12 +12,4 @@ export class CreateMessageDto {
 export class EditMessageDto {
   @IsString()
   content: string;
-
-  @IsInt()
-  messageId: number;
-}
-
-export class DeleteMessageDto {
-  @IsInt()
-  messageId: number;
 }

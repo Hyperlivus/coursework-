@@ -3,10 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Chat } from '../../chat/entity/chat.entry';
 import { User } from '../../user/entry/user.entry';
+import { Message } from '../../message/entry/message.entry';
 
 export enum Role {
   MEMBER = 'member',
@@ -27,6 +29,9 @@ export class Member {
 
   @Column({ type: 'enum', enum: Role })
   role: Role;
+
+  @OneToMany(() => Message, (message) => message.creator)
+  messages: Message[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -9,6 +9,7 @@ import { Chat } from './chat/entity/chat.entry';
 import { MemberModule } from './member/member.module';
 import { Member } from './member/entity/member.entity';
 import { MessageModule } from './message/message.module';
+import { Message } from './message/entry/message.entry';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { MessageModule } from './message/message.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: true,
-      entities: [User, Chat, Member],
+      entities: [User, Chat, Member, Message],
     }),
     ChatModule,
     MemberModule,

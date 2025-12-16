@@ -5,15 +5,10 @@ import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entry/user.entry';
 import { QueryFailedError } from 'typeorm';
-import {
-  LOGIN_ERROR,
-  UNDEFINED_AUTH_ERROR,
-  USER_WITH_EMAIL_ALREADY_EXISTS,
-  USER_WITH_TAG_ALREADY_EXISTS_SUCCESS,
-} from './errors';
+import { authError } from './errors';
 
-const NOT_UNIQUE_EMAIL_CODE = '';
-const NOT_UNIQUE_TAG_CODE = '';
+const NOT_UNIQUE_EMAIL_CODE = 'UQ_e12875dfb3b1d92d7d7c5377e22';
+const NOT_UNIQUE_TAG_CODE = 'UQ_7360583b3b97a10fb0d971bafde';
 
 export interface UserPayload {
   id: number;
@@ -52,14 +47,13 @@ export class AuthService {
     const userCreationResult = await this.userService
       .createOne(attributes)
       .catch((err: QueryFailedError) => {
-        const code = (err as any).code;
+        const code = (err as any).constraint;
         if (code === NOT_UNIQUE_EMAIL_CODE)
-          return USER_WITH_EMAIL_ALREADY_EXISTS;
+          return authError.EMAIL_ALREADY_EXISTS;
 
-        if (code === NOT_UNIQUE_TAG_CODE)
-          return USER_WITH_TAG_ALREADY_EXISTS_SUCCESS;
+        if (code === NOT_UNIQUE_TAG_CODE) return authError.TAG_ALREADY_EXISTS;
 
-        return UNDEFINED_AUTH_ERROR;
+        return authError.LOGIN_ERROR;
       });
 
     if (userCreationResult instanceof Error) {
@@ -73,8 +67,9 @@ export class AuthService {
     const user = await this.userService.findByEmailOrTag(dto.emailOrTag);
     if (!user) throw new UnauthorizedException();
 
-    if (!(await compare(dto.password, user.password))) throw LOGIN_ERROR;
+    if (!(await compare(dto.password, user.password)))
+      throw authError.LOGIN_ERROR;
 
-    return user;
+    return this.generateToken(user);
   }
 }

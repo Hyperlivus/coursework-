@@ -1,8 +1,10 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-export const SUPER_ADMIN_ONLY_ONE = new BadRequestException(
-  'in chat can exist only one super admin',
-);
-export const DONT_HAVE_ACCESS_TO_CHAT = new BadRequestException(
-  'user does not have access to chat',
-);
+export const memberError = {
+  NOT_A_MEMBER: new BadRequestException('you must be a member of this chat'),
+  SUPER_ADMIN_ALREADY_EXISTS: new BadRequestException(
+    'super admin already exists',
+  ),
+  NO_ACCESS: new BadRequestException('member not have access to this action'),
+  NOT_FOUND: new NotFoundException('member not found'),
+};

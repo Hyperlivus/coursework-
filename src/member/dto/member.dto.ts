@@ -5,6 +5,9 @@ export class MemberCreationDto {
   @IsInt()
   chatId: number;
 
+  @IsInt()
+  userId: number;
+
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
