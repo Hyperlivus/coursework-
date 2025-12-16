@@ -11,6 +11,8 @@ import { Member } from './member/entity/member.entity';
 import { MessageModule } from './message/message.module';
 import { Message } from './message/entry/message.entry';
 import { ReactionModule } from './reaction/reaction.module';
+import { Reaction } from './reaction/entity/reaction.entity';
+import { ReactionType } from './reaction/entity/reaction-type.entity';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { ReactionModule } from './reaction/reaction.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: true,
-      entities: [User, Chat, Member, Message],
+      entities: [User, Chat, Member, Message, Reaction, ReactionType],
     }),
     ChatModule,
     MemberModule,

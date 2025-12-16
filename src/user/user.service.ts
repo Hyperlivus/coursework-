@@ -46,10 +46,7 @@ export class UserService {
       ...updated,
     };
 
-    console.log(newUser);
-
     const updateRes = await this.userRepository.save(newUser).catch((err) => {
-      console.log(err);
       if (err.constraint === NOT_UNIQUE_TAG_CODE)
         return authError.TAG_ALREADY_EXISTS;
       return userErrors.UNKNOWN_EDIT_ERROR;

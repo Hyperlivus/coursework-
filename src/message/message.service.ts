@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { Message } from './entry/message.entry';
 import { CreateMessageDto, EditMessageDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -106,6 +106,13 @@ export class MessageService {
       },
       skip: params.chunk * params.size,
       take: params.size,
+    });
+  }
+
+  async findMessageById(id: number, relations?: FindOneOptions['relations']) {
+    return await this.messageRepository.findOne({
+      where: { id },
+      relations,
     });
   }
 }

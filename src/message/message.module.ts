@@ -9,5 +9,6 @@ import { MemberModule } from '../member/member.module';
   providers: [MessageService],
   controllers: [MessageController],
   imports: [TypeOrmModule.forFeature([Message]), MemberModule],
+  exports: [MessageService],
 })
 export class MessageModule {}

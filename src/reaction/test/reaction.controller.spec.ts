@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ReactionController } from './reaction.controller';
+import { ReactionController } from '../reaction.controller';
 
 describe('ReactionController', () => {
   let controller: ReactionController;
