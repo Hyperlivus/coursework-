@@ -10,6 +10,7 @@ import { MemberModule } from './member/member.module';
 import { Member } from './member/entity/member.entity';
 import { MessageModule } from './message/message.module';
 import { Message } from './message/entry/message.entry';
+import { ReactionModule } from './reaction/reaction.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Message } from './message/entry/message.entry';
     ChatModule,
     MemberModule,
     MessageModule,
+    ReactionModule,
   ],
 })
 export class AppModule {}
