@@ -1,7 +1,7 @@
 import { IsEnum, IsInt, IsOptional } from 'class-validator';
 import { Role } from '../entity/member.entity';
 
-export class MemberCreationDto {
+export class CreateMemberDto {
   @IsInt()
   chatId: number;
 
@@ -11,4 +11,18 @@ export class MemberCreationDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
+}
+
+export class LeaveDto {
+  @IsInt()
+  memberId: number;
+
+  @IsOptional()
+  @IsInt()
+  nextSuperAdminId?: number;
+}
+
+export class BanMemberDto {
+  @IsInt()
+  memberId: number;
 }

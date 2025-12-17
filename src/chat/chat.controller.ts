@@ -19,7 +19,7 @@ export class ChatController {
   @AuthRequired()
   @Post('/')
   async create(@Req() req: AuthorizedRequest, @Body() dto: ChatCreationDto) {
-    return this.chatService.create(req.user, dto);
+    return this.chatService.createOne(req.user, dto);
   }
 
   @Get('/search')

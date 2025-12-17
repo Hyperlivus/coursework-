@@ -20,7 +20,7 @@ export class ReactionService {
     private readonly messageService: MessageService,
   ) {}
 
-  async findAllReactionTypes() {
+  async findAllReactionTypes(repository = this.reactionTypeRepository) {
     return await this.reactionTypeRepository.find();
   }
 

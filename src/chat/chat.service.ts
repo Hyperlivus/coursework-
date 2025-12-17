@@ -18,7 +18,7 @@ export class ChatService {
     private readonly memberService: MemberService,
   ) {}
 
-  async createChat(dto: ChatCreationDto, repository = this.repository) {
+  async createChatEntity(dto: ChatCreationDto, repository = this.repository) {
     const chat = repository.create(dto);
     const res = await repository.save(chat).catch((err: QueryFailedError) => {
       const { code } = err as any;
@@ -31,13 +31,13 @@ export class ChatService {
     return res;
   }
 
-  async create(user: User, dto: ChatCreationDto) {
+  async createOne(user: User, dto: ChatCreationDto) {
     return await this.dataSource.transaction(async (entityManager) => {
       const chatRepository = entityManager.getRepository(Chat);
       const memberRepository = entityManager.getRepository(Member);
 
-      const chat = await this.createChat(dto, chatRepository);
-      const member = await this.memberService.create(
+      const chat = await this.createChatEntity(dto, chatRepository);
+      const member = await this.memberService.createOne(
         {
           chatId: chat.id,
           role: Role.SUPER_ADMIN,
@@ -61,10 +61,12 @@ export class ChatService {
         { name: ILike(`%${query}%`) },
         { description: ILike(`%${query}%`) },
       ],
+      take: 10,
     });
   }
 
-  async statistics(chatId: number) {
-    return await this.repository.createQueryBuilder('chat');
-  }
+  //TODO зробити якщо буде час
+  // async statistics(chatId: number) {
+  //   return await this.repository.createQueryBuilder('chat');
+  // }
 }

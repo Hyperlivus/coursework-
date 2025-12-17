@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User, UserCreationAttributes } from './entry/user.entry';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditUserDto } from './dto';
@@ -55,5 +55,14 @@ export class UserService {
     if (updateRes instanceof Error) throw updateRes;
 
     return updateRes;
+  }
+
+  async search(query: string) {
+    return await this.userRepository.find({
+      where: {
+        nickname: ILike(`%${query}%`),
+        tag: ILike(`%${query}%`),
+      },
+    });
   }
 }

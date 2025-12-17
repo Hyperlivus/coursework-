@@ -9,16 +9,16 @@ import { Role } from '../member/entity/member.entity';
 import { messagesErrors } from './errors';
 
 export interface MessagesFetchParams {
-  chunk: number;
-  size: number;
+  chunk?: number;
+  size?: number;
 }
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
-    private readonly messageRepository: Repository<Message>,
-    @Inject() private readonly memberService: MemberService,
+    readonly messageRepository: Repository<Message>,
+    @Inject() readonly memberService: MemberService,
   ) {}
 
   async createOne(userId: number, dto: CreateMessageDto) {
@@ -93,6 +93,8 @@ export class MessageService {
   async fetchMessages(user: User, chatId: number, params: MessagesFetchParams) {
     await this.memberService.findMember(chatId, user.id);
 
+    const chunk = params.chunk ?? 0;
+    const size = params.size ?? 30;
     return await this.messageRepository.find({
       where: {
         creator: {
@@ -104,8 +106,11 @@ export class MessageService {
       relations: {
         creator: true,
       },
-      skip: params.chunk * params.size,
-      take: params.size,
+      skip: chunk * size,
+      take: size,
+      order: {
+        createdAt: 'desc',
+      },
     });
   }
 

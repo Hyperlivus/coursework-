@@ -1,7 +1,16 @@
-import { Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { MemberService } from './member.service';
 import { type AuthorizedRequest, AuthRequired } from '../auth/guard/auth.guard';
-import { MemberCreationDto } from './dto/member.dto';
+import { CreateMemberDto, BanMemberDto, LeaveDto } from './dto/member.dto';
 
 @Controller('member')
 export class MemberController {
@@ -9,19 +18,35 @@ export class MemberController {
 
   @AuthRequired()
   @Post('/')
-  async create(@Req() req: AuthorizedRequest, dto: MemberCreationDto) {
-    return this.memberService.create(dto, req.user);
+  async create(@Req() req: AuthorizedRequest, dto: CreateMemberDto) {
+    return this.memberService.createOne(dto, req.user);
+  }
+
+  @AuthRequired()
+  @Get('/my')
+  async getMyMembers(@Req() req: AuthorizedRequest) {
+    return this.memberService.getByUser(req.user.id);
   }
 
   @AuthRequired()
   @Get('chat/:chatId')
   async findChatMembers(@Param('chatId') chatId: number) {
-    return this.memberService.getChatMembers(chatId);
+    return this.memberService.getByChat(chatId);
   }
 
   @AuthRequired()
-  @Delete('/:id')
-  async banMember(@Req() req: AuthorizedRequest, @Param('id') id: number) {
-    return this.memberService.deleteMember(req.user, id);
+  @Delete('ban')
+  async ban(@Req() req: AuthorizedRequest, @Body() dto: BanMemberDto) {
+    return this.memberService.ban(req.user, dto.memberId);
   }
+
+  @AuthRequired()
+  @Delete('/leave')
+  async leave(@Req() req: AuthorizedRequest, @Body() dto: LeaveDto) {
+    return this.memberService.leave(req.user, dto);
+  }
+
+  @AuthRequired()
+  @Patch('/role')
+  async setRole(@Req() req: AuthorizedRequest, @Param('id') id: number) {}
 }
